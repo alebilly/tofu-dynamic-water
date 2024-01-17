@@ -71,3 +71,42 @@ RegisterCommand('flood', function(source, args)
         print('done')
     end)
 end)
+
+-- Function to control swimming when the pedestrian touches the water
+function ControllaNuoto()
+    
+    local ped = GetPlayerPed(-1)  
+	
+	ped_wunter = IsPedSwimmingUnderWater(ped) 
+	
+	if ped_wunter == false then
+		ClearPedTasks(ped) 
+		ForcePedMotionState(ped, -1855028596)  
+		print("Ped forzato a nuotare")
+	end
+end
+
+RegisterCommand('fix-nuoto', function(source, args)
+	ControllaNuoto()
+end)
+
+function IsPedBelowZLevel(ped, zLevel)
+	if zLevel then
+		local x, y, z = table.unpack(GetEntityCoords(ped, false))
+		return z < zLevel
+	end
+end
+
+Citizen.CreateThread(function()
+    while true do
+        Wait(100)  
+
+        local ped = GetPlayerPed(-1)
+        -- Change this value to set the maximum flood height
+		local zLevel = 120  
+
+        if IsPedBelowZLevel(ped, zLevel) and  ismax then
+			ControllaNuoto()
+        end
+    end
+end)
